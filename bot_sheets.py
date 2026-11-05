@@ -333,6 +333,7 @@ class Health(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
+port= int(os.getenv("PORT",1000))
 server = HTTPServer(("0.0.0.0", int(port)), Health)
 threading.Thread(target=server.serve_forever, daemon=True).start()
 
