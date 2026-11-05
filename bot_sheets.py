@@ -108,7 +108,7 @@ def save_row(row):
         ws = gc.open_by_key(SHEET_ID).sheet1
         if not ws.get_all_values():
             ws.append_row(HEADERS)
-        ws.append_row(row, value_input_option="USER_ENTERED")
+        ws.append_row(row,)
     else:
         from openpyxl import Workbook, load_workbook
         if os.path.exists(EXCEL_FILE):
@@ -181,8 +181,8 @@ async def finish(context, chat_id):
         photo = msg_link(m1.message_id) or photo
         sign = msg_link(m2.message_id) or sign
 
-    row = [d["date"], d["dept"], d["operator"], f'=IMAGE("{photo}")' if photo else"", d["comment"], d["shift"],
-           d["brigadir"], d["lider"], d["dkk"], f'=IMAGE("{sign}")' if sign else"", chat_id,
+    row = [d["date"], d["dept"], d["operator"], photo, d["comment"], d["shift"],
+           d["brigadir"], d["lider"], d["dkk"], sign, chat_id,
            datetime.now().strftime("%d.%m.%Y %H:%M")]
     try:
         await asyncio.to_thread(save_row, row)
