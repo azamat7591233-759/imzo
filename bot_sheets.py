@@ -30,7 +30,7 @@ ACCESS_CODE = os.getenv("ACCESS_CODE", "12A33")           # kirish kodi
 # docs.google.com/spreadsheets/d/19SzqbUUUPYlhWHlJGCFYWzP_O-sGjRczdMtHHIkOg3o/edit
 SHEET_ID = os.getenv("SHEET_ID", "JADVAL_ID_SHU_YERGA")
 # Imzo sahifasining HTTPS manzili (sign.html joylangan joy)
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://FOYDALANUVCHI.github.io/REPO/sign.html")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://azamat7591233-759.github.io/imzo/sign.html")
 CREDS_FILE = "credentials.json"
 EXCEL_FILE = "arizalar.xlsx"
 AUTH_FILE = "authorized.json"  # kodni kiritgan foydalanuvchilar
