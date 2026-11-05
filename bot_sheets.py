@@ -192,9 +192,9 @@ row = [
 ]
 try:
     await asyncio.to_thread(save_row, row)
-        text = "✅ Ma'lumotlar jadvalga saqlandi."
+    text = "✅ Ma'lumotlar jadvalga saqlandi."
 except Exception as e:
-        text = f"❌ Jadvalga yozishda xato: {e}"
+    text = f"❌ Jadvalga yozishda xato: {e}"
         context.user_data.clear()
 await context.bot.send_message(
         chat_id, text,
