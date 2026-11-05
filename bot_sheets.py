@@ -174,7 +174,7 @@ photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
 sign_file = await context.bot.get_file(d["sign"])
 sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
 
-  if PHOTO_CHAT_ID:
+if PHOTO_CHAT_ID:
         caption = (f"📅 {d['date']}\n🏢 {d['dept']}\n👤 {d['operator']}\n"
                    f"💬 {d['comment']}\n🕐 {d['shift']}\n👷 {d['brigadir']}\n"
                    f"⭐ {d['lider']}\n🔍 {d['dkk']}")
