@@ -168,8 +168,11 @@ async def next_step(context, chat_id):
 
 async def finish(context, chat_id):
     d = context.user_data["data"]
-    photo = d["photo"]   # file_id
-    sign = d["sign"]     # file_id
+ photo_file = await context.bot.get_file(d["photo"])
+ photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
+
+ sign_file = await context.bot.get_file(d["sign"])
+ sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
 
     if PHOTO_CHAT_ID:
         caption = (f"📅 {d['date']}\n🏢 {d['dept']}\n👤 {d['operator']}\n"
@@ -181,9 +184,20 @@ async def finish(context, chat_id):
         photo = msg_link(m1.message_id) or photo
         sign = msg_link(m2.message_id) or sign
 
-    row = [d["date"], d["dept"], d["operator"], photo, d["comment"], d["shift"],
-           d["brigadir"], d["lider"], d["dkk"], sign, chat_id,
-           datetime.now().strftime("%d.%m.%Y %H:%M")]
+  row = [
+    d["date"],
+    d["dept"],
+    d["operator"],
+    f'=IMAGE("{photo_url}")' if photo_url else "",  # <--- Mana bu yerga
+    d["comment"],
+    d["shift"],
+    d["brigadier"],
+    d["lider"],
+    d["dkk"],
+    f'=IMAGE("{sign_url}")' if sign_url else "",   # <--- Mana bu yerga
+    chat_id,
+    datetime.now().strftime("%d.%m.%Y %H:%M"),
+]
     try:
         await asyncio.to_thread(save_row, row)
         text = "✅ Ma'lumotlar jadvalga saqlandi."
