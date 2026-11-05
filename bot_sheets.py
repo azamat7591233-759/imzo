@@ -212,6 +212,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🔑 Kodni kiriting:", reply_markup=ReplyKeyboardRemove())
 
 
+# Agar foydalanuvchi Web App orqali imzo yuborsa (rasm sifatida)
+if update.message and update.message.photo:
+    step = context.user_data.get("step")
+    if step is not None and STEPS[step][0] == "sign":
+        chat_id = update.effective_chat.id
+        context.user_data["data"]["sign"] = update.message.photo[-1].file_id
+        await update.message.reply_text("✍️ Imzo qabul qilindi!")
+        await next_step(context, chat_id)
+        return
+      
 async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     step = context.user_data.get("step")
     chat_id = update.effective_chat.id
