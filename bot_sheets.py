@@ -22,6 +22,7 @@ from telegram import (Update, InlineKeyboardButton, InlineKeyboardMarkup,
                       WebAppInfo)
 from telegram.ext import (Application, CommandHandler, MessageHandler,
                           CallbackQueryHandler, ContextTypes, filters)
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # ---------------- SOZLAMALAR ----------------
 TOKEN = os.getenv("BOT_TOKEN", "9053618634:AAHRvyBkPUJ9Bn_WRqxcsaiP7Dy_XiZDuto")   # BotFather tokeni
