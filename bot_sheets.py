@@ -1,3 +1,4 @@
+
 """
 Obyasnitel boti (sxema bo'yicha) + barmoq bilan imzo (Telegram Mini App)
 
@@ -15,26 +16,22 @@ import io
 import os
 import json
 import asyncio
-import threading
 from datetime import datetime
 from telegram import (Update, InlineKeyboardButton, InlineKeyboardMarkup,
                       KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove,
                       WebAppInfo)
 from telegram.ext import (Application, CommandHandler, MessageHandler,
                           CallbackQueryHandler, ContextTypes, filters)
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # ---------------- SOZLAMALAR ----------------
 TOKEN = os.getenv("BOT_TOKEN", "9053618634:AAHRvyBkPUJ9Bn_WRqxcsaiP7Dy_XiZDuto")   # BotFather tokeni
 ACCESS_CODE = os.getenv("ACCESS_CODE", "12A33")           # kirish kodi
 # Jadval manzilidagi /d/ dan keyingi va /edit dan oldingi uzun kod:
-# docs.google.com/spreadsheets/d/  SHU_YERDAGI_KOD  /edit
-SHEET_ID = os.getenv("SHEET_ID", "19SzqbUUUPYlhWHlJGCFYWzP_O-sGjRczdMtHHIkOg3o")
+# docs.google.com/spreadsheets/d/19SzqbUUUPYlhWHlJGCFYWzP_O-sGjRczdMtHHIkOg3o/edit
+SHEET_ID = os.getenv("SHEET_ID", "JADVAL_ID_SHU_YERGA")
 # Imzo sahifasining HTTPS manzili (sign.html joylangan joy)
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://https://azamat7591233-759.github.io/imzo/sign.html")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://FOYDALANUVCHI.github.io/REPO/sign.html")
 CREDS_FILE = "credentials.json"
-if not os.path.exists(CREDS_FILE) and os.path.exists("/etc/secrets/credentials.json"):
-     CREDS_FILE ="/etc/secrets/credentials.json"                                                
 EXCEL_FILE = "arizalar.xlsx"
 AUTH_FILE = "authorized.json"  # kodni kiritgan foydalanuvchilar
 # Rasmlar va imzolar yuboriladigan guruh/kanal ID (bot u yerda admin bo'lishi kerak).
@@ -108,7 +105,7 @@ def save_row(row):
         ws = gc.open_by_key(SHEET_ID).sheet1
         if not ws.get_all_values():
             ws.append_row(HEADERS)
-        ws.append_row(row,)
+        ws.append_row(row, value_input_option="USER_ENTERED")
     else:
         from openpyxl import Workbook, load_workbook
         if os.path.exists(EXCEL_FILE):
@@ -153,7 +150,7 @@ async def ask(context, chat_id):
         rows.append([InlineKeyboardButton("3-смена", callback_data="shift:3-смена")])
     if idx > 0:
         rows.append([InlineKeyboardButton(BACK_TXT, callback_data="back")])
-        await context.bot.send_message(
+    await context.bot.send_message(
         chat_id, text,
         reply_markup=InlineKeyboardMarkup(rows) if rows else None)
 
@@ -161,49 +158,36 @@ async def ask(context, chat_id):
 async def next_step(context, chat_id):
     context.user_data["step"] += 1
     if context.user_data["step"] >= len(STEPS):
-        await finish(update, context, chat_id)
+        await finish(context, chat_id)
     else:
         await ask(context, chat_id)
 
-async def finish(update, context, chat_id): 
-  d = context.user_data["data"]
-  photo_file = await context.bot.get_file(d["photo"])
-  photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
 
-  sign_file = await context.bot.get_file(d["sign"])
-  sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
+async def finish(context, chat_id):
+    d = context.user_data["data"]
+    photo = d["photo"]   # file_id
+    sign = d["sign"]     # file_id
 
-  row = [
-    d["date"],
-    d["dept"],
-    d["operator"],
-    f'=IMAGE("{photo_url}")',
-    d["comment"],
-    d["shift"],
-    d["brigadier"],
-    d["lider"],
-    d["dkk"],
-    f'=IMAGE("{sign_url}")',
-    str(chat_id),
-    datetime.now().strftime("%d.%m.%Y %H:%M"),
-]
+    if PHOTO_CHAT_ID:
+        caption = (f"📅 {d['date']}\n🏢 {d['dept']}\n👤 {d['operator']}\n"
+                   f"💬 {d['comment']}\n🕐 {d['shift']}\n👷 {d['brigadir']}\n"
+                   f"⭐ {d['lider']}\n🔍 {d['dkk']}")
+        m1 = await context.bot.send_photo(PHOTO_CHAT_ID, photo, caption=caption)
+        m2 = await context.bot.send_photo(
+            PHOTO_CHAT_ID, sign, caption=f"✍️ Imzo — {d['operator']} ({d['date']})")
+        photo = msg_link(m1.message_id) or photo
+        sign = msg_link(m2.message_id) or sign
 
-try:
-    await asyncio.to_thread(save_row, row)
-  text = "✅ Ma'lumotlar jadvalga muvaffaqiyatli saqlandi!"
-except Exception as e:
-    text = f"❌ Jadvalga yozishda xato: {e}"
-
-rows = []
-rows.append([InlineKeyboardButton("➕ Yangi ariza", callback_data="now")])
-
-await context.bot.send_message(
-    chat_id,
-    text,
-    reply_markup=InlineKeyboardMarkup(rows)
-)
-context.user_data.clear()
-await context.bot.send_message(
+    row = [d["date"], d["dept"], d["operator"], photo, d["comment"], d["shift"],
+           d["brigadir"], d["lider"], d["dkk"], sign, chat_id,
+           datetime.now().strftime("%d.%m.%Y %H:%M")]
+    try:
+        await asyncio.to_thread(save_row, row)
+        text = "✅ Ma'lumotlar jadvalga saqlandi."
+    except Exception as e:
+        text = f"❌ Jadvalga yozishda xato: {e}"
+    context.user_data.clear()
+    await context.bot.send_message(
         chat_id, text,
         reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton("➕ Yangi ariza", callback_data="new")]]))
@@ -326,30 +310,6 @@ async def on_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await next_step(context, chat_id)
 
 
-def start_health_server():
-    """Render Web Service ochiq port talab qiladi. Kompyuterda ishlamaydi (PORT yo'q)."""
-    port = os.getenv("PORT")
-    if not port:
-        return
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-    
-class Health(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"ok")
-
-    def do_HEAD(self):
-        self.send_response(200)
-        self.end_headers()
-
-    def log_message(self, *args):
-        pass
-
-port= int(os.getenv("PORT",1000))
-server = HTTPServer(("0.0.0.0", int(port)), Health)
-threading.Thread(target=server.serve_forever, daemon=True).start()
-
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -362,3 +322,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
