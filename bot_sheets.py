@@ -15,6 +15,7 @@ import io
 import os
 import json
 import asyncio
+import threading
 from datetime import datetime
 from telegram import (Update, InlineKeyboardButton, InlineKeyboardMarkup,
                       KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove,
@@ -31,6 +32,7 @@ SHEET_ID = os.getenv("SHEET_ID", "19SzqbUUUPYlhWHlJGCFYWzP_O-sGjRczdMtHHIkOg3o")
 # Imzo sahifasining HTTPS manzili (sign.html joylangan joy)
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://https://azamat7591233-759.github.io/imzo/sign.html")
 CREDS_FILE = "credentials.json"
+if not os.path.exists(CREDS_FILE) and os.path.exists("/etc/secrets/credentials.json):
 EXCEL_FILE = "arizalar.xlsx"
 AUTH_FILE = "authorized.json"  # kodni kiritgan foydalanuvchilar
 # Rasmlar va imzolar yuboriladigan guruh/kanal ID (bot u yerda admin bo'lishi kerak).
@@ -308,6 +310,22 @@ async def on_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["data"]["shift"] = q.data.split(":", 1)[1]
         await next_step(context, chat_id)
 
+
+class Health(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"ok")
+
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
+
+    def log_message(self, *args):
+        pass
+
+server = HTTPServer(("0.0.0.0", int(port)), Health)
+threading.Thread(target=server.serve_forever, daemon=True).start()
 
 def main():
     app = Application.builder().token(TOKEN).build()
