@@ -174,14 +174,14 @@ async def finish(update, context, chat_id):
     sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
 
 if PHOTO_CHAT_ID:
-        caption = (f"📅 {d['date']}\n🏢 {d['dept']}\n👤 {d['operator']}\n"
+   caption = (f"📅 {d['date']}\n🏢 {d['dept']}\n👤 {d['operator']}\n"
                    f"💬 {d['comment']}\n🕐 {d['shift']}\n👷 {d['brigadir']}\n"
                    f"⭐ {d['lider']}\n🔍 {d['dkk']}")
-        m1 = await context.bot.send_photo(PHOTO_CHAT_ID, photo, caption=caption)
-        m2 = await context.bot.send_photo(
+   m1 = await context.bot.send_photo(PHOTO_CHAT_ID, photo, caption=caption)
+   m2 = await context.bot.send_photo(
             PHOTO_CHAT_ID, sign, caption=f"✍️ Imzo — {d['operator']} ({d['date']})")
-        photo = msg_link(m1.message_id) or photo
-        sign = msg_link(m2.message_id) or sign
+   photo = msg_link(m1.message_id) or photo
+   sign = msg_link(m2.message_id) or sign
 
 row = [
     d["date"],
