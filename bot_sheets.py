@@ -190,7 +190,7 @@ async def finish(update, context, chat_id):
 
 try:
   await asyncio.to_thread(save_row, row)
-    text = "✅ Ma'lumotlar jadvalga muvaffaqiyatli saqlandi!"
+  text = "✅ Ma'lumotlar jadvalga muvaffaqiyatli saqlandi!"
 except Exception as e:
     text = f"❌ Jadvalga yozishda xato: {e}"
 
