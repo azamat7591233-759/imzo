@@ -32,7 +32,6 @@ SHEET_ID = os.getenv("SHEET_ID", "19SzqbUUUPYlhWHlJGCFYWzP_O-sGjRczdMtHHIkOg3o")
 # Imzo sahifasining HTTPS manzili (sign.html joylangan joy)
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://https://azamat7591233-759.github.io/imzo/sign.html")
 CREDS_FILE = "credentials.json"
-if not os.path.exists(CREDS_FILE) and os.path.exists("/etc/secrets/credentials.json):
 EXCEL_FILE = "arizalar.xlsx"
 AUTH_FILE = "authorized.json"  # kodni kiritgan foydalanuvchilar
 # Rasmlar va imzolar yuboriladigan guruh/kanal ID (bot u yerda admin bo'lishi kerak).
