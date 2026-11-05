@@ -198,13 +198,13 @@ row = [
     chat_id,
     datetime.now().strftime("%d.%m.%Y %H:%M"),
 ]
-    try:
+try:
         await asyncio.to_thread(save_row, row)
         text = "✅ Ma'lumotlar jadvalga saqlandi."
-    except Exception as e:
+except Exception as e:
         text = f"❌ Jadvalga yozishda xato: {e}"
     context.user_data.clear()
-    await context.bot.send_message(
+await context.bot.send_message(
         chat_id, text,
         reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton("➕ Yangi ariza", callback_data="new")]]))
