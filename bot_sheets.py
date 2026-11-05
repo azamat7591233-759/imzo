@@ -165,37 +165,43 @@ async def next_step(context, chat_id):
     else:
         await ask(context, chat_id)
 
-async def finish(update, context, chat_id):
-    d = context.user_data["data"]
-    photo_file = await context.bot.get_file(d["photo"])
-    photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
+async def finish(update, context, chat_id): d = context.user_data["data"]
+photo_file = await context.bot.get_file(d["photo"])
+photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
 
-    sign_file = await context.bot.get_file(d["sign"])
-    sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
-
-photo = msg_link(m1.message_id) or photo
-sign = msg_link(m2.message_id) or sign
+sign_file = await context.bot.get_file(d["sign"])
+sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
 
 row = [
     d["date"],
     d["dept"],
     d["operator"],
-    f'=IMAGE("{photo_url}")' if photo_url else "",  # <--- Mana bu yerga
+    f'=IMAGE("{photo_url}")',
     d["comment"],
     d["shift"],
     d["brigadier"],
     d["lider"],
     d["dkk"],
-    f'=IMAGE("{sign_url}")' if sign_url else "",   # <--- Mana bu yerga
-    chat_id,
+    f'=IMAGE("{sign_url}")',
+    str(chat_id),
     datetime.now().strftime("%d.%m.%Y %H:%M"),
 ]
+
 try:
-  await asyncio.to_thread(save_row, row)
-  text = "✅ Ma'lumotlar jadvalga saqlandi."
+    await asyncio.to_thread(save_row, row)
+    text = "✅ Ma'lumotlar jadvalga muvaffaqiyatli saqlandi!"
 except Exception as e:
     text = f"❌ Jadvalga yozishda xato: {e}"
-    context.user_data.clear()
+
+rows = []
+rows.append([InlineKeyboardButton("➕ Yangi ariza", callback_data="now")])
+
+await context.bot.send_message(
+    chat_id,
+    text,
+    reply_markup=InlineKeyboardMarkup(rows)
+)
+context.user_data.clear()
 await context.bot.send_message(
         chat_id, text,
         reply_markup=InlineKeyboardMarkup(
