@@ -184,7 +184,7 @@ if PHOTO_CHAT_ID:
         photo = msg_link(m1.message_id) or photo
         sign = msg_link(m2.message_id) or sign
 
-  row = [
+row = [
     d["date"],
     d["dept"],
     d["operator"],
