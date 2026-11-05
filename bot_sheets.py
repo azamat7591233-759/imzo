@@ -195,7 +195,7 @@ try:
     text = "✅ Ma'lumotlar jadvalga saqlandi."
 except Exception as e:
     text = f"❌ Jadvalga yozishda xato: {e}"
-        context.user_data.clear()
+    context.user_data.clear()
 await context.bot.send_message(
         chat_id, text,
         reply_markup=InlineKeyboardMarkup(
