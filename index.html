@@ -14,76 +14,58 @@
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
+    let tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    const cv = document.getElementById('pad');
-    const ctx = cv.getContext('2d');
-    const hint = document.getElementById('hint');
-
-    // Canvas aniqligini to'g'rilash
-    cv.width = cv.offsetWidth;
-    cv.height = cv.offsetHeight;
-
+    const canvas = document.getElementById('pad');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
     ctx.strokeStyle = '#000';
 
-    let drawing = false;
+    let writingMode = false;
 
     const getPos = (e) => {
-        const rect = cv.getBoundingClientRect();
+        const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return [clientX - rect.left, clientY - rect.top];
     };
 
-    cv.addEventListener('pointerdown', (e) => {
-        drawing = true;
+    canvas.addEventListener('pointerdown', (e) => {
+        writingMode = true;
         ctx.beginPath();
         const [x, y] = getPos(e);
         ctx.moveTo(x, y);
-        hint.style.display = 'none';
+        document.getElementById('hint').style.display = 'none';
     });
 
-    cv.addEventListener('pointermove', (e) => {
-        if (!drawing) return;
+    canvas.addEventListener('pointerup', () => {
+        writingMode = false;
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+        if (!writingMode) return;
         const [x, y] = getPos(e);
         ctx.lineTo(x, y);
         ctx.stroke();
     });
 
-    cv.addEventListener('pointerup', () => { drawing = false; });
-    cv.addEventListener('pointercancel', () => { drawing = false; });
-    cv.addEventListener('pointerleave', () => { drawing = false; });
-
-    // Очистить (Tozalash) tugmasi
     document.getElementById('clear').addEventListener('click', () => {
-        ctx.clearRect(0, 0, cv.width, cv.height);
-        hint.style.display = 'flex';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('hint').style.display = 'flex';
     });
 
-    // Готов (Tayyor) tugmasi
     document.getElementById('done').addEventListener('click', () => {
-        // Imzo bo'sh emasligini tekshirish
-        const blank = document.createElement('canvas');
-        blank.width = cv.width;
-        blank.height = cv.height;
-        if (cv.toDataURL() === blank.toDataURL()) {
-            alert('Сначала нарисуйте подпись');
-            return;
-        }
-
-        const dataURL = cv.toDataURL('image/png');
-
-        if (tg && tg.initData) {
-            // Telegram botga yuborish
+        const dataURL = canvas.toDataURL('image/png');
+        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             tg.sendData(dataURL);
             tg.close();
         } else {
-            // Oddiy brauzerda tekshirganda rasm bo'lib yuklanadi
             const link = document.createElement('a');
             link.href = dataURL;
             link.download = 'imzo.png';
@@ -91,4 +73,5 @@
         }
     });
 </script>
+
 
