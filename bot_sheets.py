@@ -167,13 +167,13 @@ async def next_step(context, chat_id):
 
 async def finish(update, context, chat_id): 
   d = context.user_data["data"]
-photo_file = await context.bot.get_file(d["photo"])
-photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
+  photo_file = await context.bot.get_file(d["photo"])
+  photo_url = f"https://api.telegram.org/file/bot{TOKEN}/{photo_file.file_path}"
 
-sign_file = await context.bot.get_file(d["sign"])
-sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
+  sign_file = await context.bot.get_file(d["sign"])
+  sign_url = f"https://api.telegram.org/file/bot{TOKEN}/{sign_file.file_path}"
 
-row = [
+  row = [
     d["date"],
     d["dept"],
     d["operator"],
